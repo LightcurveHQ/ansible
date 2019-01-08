@@ -1,0 +1,10 @@
+---
+
+cmk_bin_path: /usr/local/bin/check_mk_agent
+cmk_config_dir:  /etc/check_mk
+cmk_plugins_cache_time: 3600
+cmk_plugins_dir: "{{ cmk_usr_dir }}/plugins"
+cmk_usr_dir: /usr/lib/check_mk_agent
+cmk_user_id: 6556
+cmk_user_name: checkmk
+cmk_var_dir: /var/lib/check_mk_agent

@@ -1,0 +1,15 @@
+---
+
+# mk-job requires /usr/bin/time
+- name: Ensure time is installed
+  apt:
+    name: time
+    state: present
+
+- name: Ensure mk-job is installed
+  copy:
+    src: mk-job
+    dest: /usr/local/bin/mk-job
+    owner: root
+    group: root
+    mode: 0755

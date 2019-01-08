@@ -1,0 +1,8 @@
+[Unit]
+Description=Simple server that scrapes HAProxy stats and exports them via HTTP for Prometheus consumption
+
+[Service]
+ExecStart={{ haproxy__haproxy_exporter_path }} {{ haproxy__haproxy_exporter_options }}
+
+[Install]
+WantedBy=multi-user.target

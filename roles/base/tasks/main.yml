@@ -1,0 +1,34 @@
+---
+
+- name: Install secure sshd_config
+  copy:
+    src: sshd_config__{{ ansible_lsb.codename }}
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: 0644
+  notify: Reload sshd
+
+- name: Install /etc/hosts
+  template:
+    src: hosts.j2
+    dest: /etc/hosts
+    owner: root
+    group: root
+    mode: 0644
+  when: not inventory_hostname|ipaddr
+
+- name: Set hostname
+  hostname:
+    name: "{{ inventory_hostname }}"
+  when: not inventory_hostname|ipaddr
+
+- name: Decrease dhclient timeout
+  lineinfile:
+    path: /etc/dhcp/dhclient.conf
+    regexp: '^timeout.*$'
+    line: 'timeout 10;'
+
+- name: Set timezone to UTC
+  timezone:
+    name: UTC

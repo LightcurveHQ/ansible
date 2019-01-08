@@ -1,0 +1,9 @@
+#!/bin/sh -e
+
+if [ -f /var/run/reboot-required ]; then
+  echo "1 Reboot - $( cat /var/run/reboot-required ) -- packages: $( sed ':a;N;$!ba;s/\n/, /g' /var/run/reboot-required.pkgs )"
+  exit 1
+else
+  echo "0 Reboot - no reboot required"
+  exit 0
+fi

@@ -1,0 +1,122 @@
+---
+
+- name: Ensure Check_MK agent directories exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - "{{ cmk_plugins_dir }}"
+    - "{{ cmk_plugins_dir }}/{{ cmk_plugins_cache_time }}"
+    - "{{ cmk_usr_dir }}"
+    - "{{ cmk_usr_dir }}/local"
+    - "{{ cmk_var_dir }}"
+    - "{{ cmk_var_dir }}/cache"
+    - "{{ cmk_var_dir }}/job"
+    - "{{ cmk_var_dir }}/spool"
+
+- name: Ensure Check_MK agent is installed
+  copy:
+    src: check_mk_agent
+    dest: "{{ cmk_bin_path }}"
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Ensure Check_MK agent config directory exist
+  file:
+    path: "{{ cmk_config_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Ensure Check_MK agent configuration exist
+  copy:
+    src: "{{ item }}"
+    dest: "{{ cmk_config_dir }}/{{ item }}"
+    owner: root
+    group: root
+    mode: 0600
+  with_items:
+    - logwatch.cfg
+
+- name: Ensure Check_MK agent plugins are installed
+  copy:
+    src: "{{ item }}"
+    dest: "{{ cmk_plugins_dir }}/{{ item }}"
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - mk_logwatch
+
+- name: Ensure Check_MK agent cached plugins are installed
+  copy:
+    src: "{{ item }}"
+    dest: "{{ cmk_plugins_dir }}/{{ cmk_plugins_cache_time }}/{{ item }}"
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - mk_inventory
+
+- name: Ensure CheckMK agent local checks are installed
+  copy:
+    src: "{{ item }}"
+    dest: "{{ cmk_usr_dir }}/local/{{ item }}"
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - check_reboot
+
+- name: Ensure CheckMK agent APT check is installed (Ubuntu)
+  copy:
+    src: check_apt
+    dest: "{{ cmk_usr_dir }}/local/check_apt"
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Ensure checkmk user exists
+  user:
+    name: checkmk
+    comment: Check_MK Agent
+    uid: "{{ cmk_user_id }}"
+
+- name: Ensure checkmk user is unlocked for sshd
+  shell: 'grep ^checkmk /etc/shadow |cut -d ":" -f 2'
+  register: checkmk_password
+  changed_when: false
+
+- name: Set dummy output in check mode
+  set_fact:
+    checkmk_password:
+      stdout: "*"
+  when: ansible_check_mode
+
+- name: Unlock checkmk user password for sshd
+  command: usermod -p "*" checkmk
+  when: checkmk_password.stdout != "*"
+
+- name: Ensure checkmk user can run check_mk_agent as root
+  template:
+    src: sudoers_checkmk.j2
+    dest: /etc/sudoers.d/checkmk
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Ensure public key is added to authorized_keys
+  authorized_key:
+    user: "{{ cmk_user_name }}"
+    state: present
+    key: "{{ lookup('file', 'checkmk.pub') }}"
+    key_options: 'command="sudo {{ cmk_bin_path }}"'
+    exclusive: yes
+  when: not ansible_check_mode
+
+- include_tasks: mk_job.yml

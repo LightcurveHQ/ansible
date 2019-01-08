@@ -1,0 +1,7 @@
+listen stats
+    bind {{ haproxy__stats_bind }}
+    mode http
+    stats enable
+    stats uri /
+
+

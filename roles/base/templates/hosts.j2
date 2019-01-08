@@ -1,0 +1,28 @@
+# {{ ansible_managed }}
+#
+# /etc/hosts: Local Host Database
+#
+# This file describes a number of aliases-to-address mappings for the for
+# local hosts that share this file.
+#
+# The format of lines in this file is:
+#
+# IP_ADDRESS	canonical_hostname	[aliases...]
+#
+#The fields can be separated by any number of spaces or tabs.
+#
+# In the presence of the domain name service or NIS, this file may not be
+# consulted at all; see /etc/host.conf for the resolution order.
+#
+
+# IPv4 and IPv6 localhost aliases
+127.0.0.1	localhost {{ inventory_hostname }}
+::1		localhost {{ inventory_hostname }}
+
+{% if etc_hosts is defined %}
+{% for host in etc_hosts %}
+{{ host.ipv4 }} {{ host.hostname }} {% if host.alias is defined %} {{ host.alias }}
+{% endif %}
+
+{% endfor %}
+{% endif %}
