@@ -1,0 +1,47 @@
+---
+
+- name: Ensure that haproxy_letsencrypt__domain is set
+  assert:
+    that: haproxy_letsencrypt__domain is defined
+
+- name: Wait until {{ haproxy_letsencrypt__domain }} can be resolved
+  debug:
+    msg: "{{ lookup('dig', haproxy_letsencrypt__domain) }}"
+  register: resolved
+  until: resolved.msg != 'NXDOMAIN'
+  retries: 10
+  delay: 30
+  ignore_errors: yes
+
+- name: Create letsencrypt certificate
+  command: >
+      certbot certonly --standalone
+                       --non-interactive
+                       --agree-tos
+                       --email {{ letsencrypt__email }}
+                       --domains {{ haproxy_letsencrypt__domain }}
+                       --http-01-port=8123
+                       --preferred-challenges=http-01
+  args:
+    creates: /etc/letsencrypt/live/{{ haproxy_letsencrypt__domain }}/fullchain.pem
+  notify: Reload HAProxy
+
+- name: Create combined certificate file
+  shell: cat /etc/letsencrypt/live/{{ haproxy_letsencrypt__domain }}/fullchain.pem /etc/letsencrypt/live/{{ haproxy_letsencrypt__domain }}/privkey.pem |tee /etc/haproxy/ssl/combined.pem.new
+  changed_when: false
+  tags:
+    - skip_ansible_lint
+
+- name: Copy combined certificate file
+  copy:
+    src: /etc/haproxy/ssl/combined.pem.new
+    dest: /etc/haproxy/ssl/combined.pem
+    remote_src: yes
+  notify: Reload HAProxy
+
+- name: Ensure renewal cronjob use http-01 challenge
+  lineinfile:
+    path: /etc/cron.d/certbot
+    regexp: '^(.*)certbot -q renew$'
+    line: '\1certbot --http-01-port=8123 --preferred-challenges=http-01 -q renew'
+    backrefs: yes

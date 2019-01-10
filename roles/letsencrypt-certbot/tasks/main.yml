@@ -1,0 +1,11 @@
+---
+
+- name: Ensure certbot PPA is configured
+  apt_repository:
+    state: present
+    repo: 'ppa:certbot/certbot'
+
+- name: Ensure certbot is installed
+  apt:
+    state: present
+    name: certbot
