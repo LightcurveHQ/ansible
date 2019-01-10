@@ -8,7 +8,7 @@ pipeline {
 					find -name '*.yml' >scripts
 					mapfile -t scripts <scripts
 					rm -f scripts
-					ansible-lint --force-color ${scripts[@]}
+					ansible-lint --force-color "${scripts[@]}"
 					'''
 				}
 			}
