@@ -3,6 +3,5 @@ Description=Simple server that scrapes HAProxy stats and exports them via HTTP f
 
 [Service]
 ExecStart={{ haproxy__haproxy_exporter_path }} {{ haproxy__haproxy_exporter_options }}
-
 [Install]
 WantedBy=multi-user.target

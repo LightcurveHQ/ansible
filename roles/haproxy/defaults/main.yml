@@ -12,4 +12,6 @@ haproxy__haproxy_exporter_sha256sum: 1d093a5f65d18100249c44da0aad0310a19d88d35a9
 haproxy__haproxy_exporter_ip: 127.0.0.1
 haproxy__haproxy_exporter_dir: /usr/local/bin
 haproxy__haproxy_exporter_path: "{{ haproxy__haproxy_exporter_dir }}/haproxy_exporter"
-haproxy__haproxy_exporter_options: "--haproxy.scrape-uri='http://{{ haproxy__stats_bind }}/?stats;csv' --web.listen-address='{{ haproxy__haproxy_exporter_ip }}:9101'"
+haproxy__haproxy_exporter_options: >
+  --haproxy.scrape-uri='http://{{ haproxy__stats_bind }}/?stats;csv'
+  --web.listen-address='{{ haproxy__haproxy_exporter_ip }}:9101'
