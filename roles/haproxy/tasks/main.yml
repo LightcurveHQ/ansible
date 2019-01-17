@@ -15,7 +15,7 @@
 
 - name: Ensure {{ haproxy__ssl_dir }} directory exists
   file:
-    path: "{{ haproxy__ssl_dir}}"
+    path: "{{ haproxy__ssl_dir }}"
     state: directory
     owner: root
     group: root

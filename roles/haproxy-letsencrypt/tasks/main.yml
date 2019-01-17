@@ -27,7 +27,10 @@
   notify: Reload HAProxy
 
 - name: Create combined certificate file
-  shell: cat /etc/letsencrypt/live/{{ haproxy_letsencrypt__domain }}/fullchain.pem /etc/letsencrypt/live/{{ haproxy_letsencrypt__domain }}/privkey.pem |tee /etc/haproxy/ssl/combined.pem.new
+  shell: >
+    cat /etc/letsencrypt/live/{{ haproxy_letsencrypt__domain }}/fullchain.pem
+    /etc/letsencrypt/live/{{ haproxy_letsencrypt__domain }}/privkey.pem
+    |tee /etc/haproxy/ssl/combined.pem.new
   changed_when: false
   tags:
     - skip_ansible_lint

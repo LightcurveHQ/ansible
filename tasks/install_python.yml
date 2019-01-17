@@ -5,4 +5,4 @@
   args:
     executable: /bin/sh
   register: raw_output
-  changed_when: raw_output.stdout != ""
+  changed_when: raw_output.stdout
