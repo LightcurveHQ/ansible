@@ -1,0 +1,22 @@
+---
+
+- name: Ensure /srv/backups directory exist
+  file:
+    state: directory
+    path: /srv/backups
+    owner: root
+    group: root
+    mode: 0750
+
+- name: Ensure gnupg2 and awscli are installed
+  apt:
+    state: present
+    name:
+      - gnupg2
+      - awscli
+
+- name: Import operators PGP keys
+  shell: 'echo "{{ item.pgpkey }}" | gpg2 --import'
+  register: result
+  changed_when: "'unchanged: 1' not in result.stderr"
+  loop: "{{ operators }}"
