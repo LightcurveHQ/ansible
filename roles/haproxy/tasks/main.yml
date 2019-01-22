@@ -1,5 +1,4 @@
 ---
-
 - name: Ensure HAProxy PPA is setup
   apt_repository:
     repo: "ppa:vbernat/haproxy-{{ haproxy__ppa_version }}"
@@ -52,7 +51,8 @@
 
 - name: Ensure haproxy_exporter is installed
   get_url:
-    url: "{{ binary_mirror }}/dist/haproxy_exporter-{{ haproxy__haproxy_exporter_version }}"
+    url: "{{ binary_mirror }}/dist/haproxy_exporter-\
+    {{ haproxy__haproxy_exporter_version }}"
     dest: /usr/local/bin/haproxy_exporter
     sha256sum: "{{ haproxy__haproxy_exporter_sha256sum }}"
     owner: root
@@ -71,4 +71,4 @@
   systemd:
     name: haproxy_exporter.service
     state: started
-    enabled: yes
+    enabled: true
