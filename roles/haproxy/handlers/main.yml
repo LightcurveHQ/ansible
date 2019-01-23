@@ -1,5 +1,4 @@
 ---
-
 - name: Assemble HAProxy configuration
   assemble:
     src: /etc/haproxy/conf.d
@@ -14,7 +13,7 @@
 
 - name: Reload systemd
   systemd:
-    daemon_reload: yes
+    daemon_reload: true
 
 - name: Restart haproxy_exporter
   systemd:

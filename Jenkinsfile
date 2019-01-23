@@ -1,6 +1,13 @@
 pipeline {
 	agent { node { label 'ansible' } }
 	stages {
+		stage('yamllint') {
+			steps {
+				ansiColor('xterm') {
+					sh 'yamllint .'
+				}
+			}
+		}
 		stage('ansible-lint') {
 			steps {
 				ansiColor('xterm') {
