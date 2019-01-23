@@ -1,5 +1,4 @@
 ---
-
 - name: Ensure Check_MK agent directories exist
   file:
     path: "{{ item }}"
@@ -116,7 +115,7 @@
     state: present
     key: "{{ lookup('file', 'checkmk.pub') }}"
     key_options: 'command="sudo {{ cmk_bin_path }}"'
-    exclusive: yes
+    exclusive: true
   when: not ansible_check_mode
 
 - include_tasks: mk_job.yml

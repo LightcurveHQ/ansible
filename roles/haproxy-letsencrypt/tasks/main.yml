@@ -1,5 +1,4 @@
 ---
-
 - name: Ensure that haproxy_letsencrypt__domain is set
   assert:
     that: haproxy_letsencrypt__domain is defined
@@ -11,7 +10,7 @@
   until: resolved.msg != 'NXDOMAIN'
   retries: 10
   delay: 30
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Create letsencrypt certificate
   command: >
@@ -23,7 +22,8 @@
                        --http-01-port=8123
                        --preferred-challenges=http-01
   args:
-    creates: /etc/letsencrypt/live/{{ haproxy_letsencrypt__domain }}/fullchain.pem
+    creates:
+      /etc/letsencrypt/live/{{ haproxy_letsencrypt__domain }}/fullchain.pem
   notify: Reload HAProxy
 
 - name: Create combined certificate file
@@ -39,12 +39,13 @@
   copy:
     src: /etc/haproxy/ssl/combined.pem.new
     dest: /etc/haproxy/ssl/combined.pem
-    remote_src: yes
+    remote_src: true
   notify: Reload HAProxy
 
 - name: Ensure renewal cronjob use http-01 challenge
   lineinfile:
     path: /etc/cron.d/certbot
     regexp: '^(.*)certbot -q renew$'
-    line: '\1certbot --http-01-port=8123 --preferred-challenges=http-01 -q renew'
-    backrefs: yes
+    line:
+      '\1certbot --http-01-port=8123 --preferred-challenges=http-01 -q renew'
+    backrefs: true
