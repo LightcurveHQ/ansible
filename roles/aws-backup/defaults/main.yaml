@@ -1,0 +1,13 @@
+---
+
+aws_backup__backups_max_age: 14  # days
+# The operators variable is an array of users to be created on target system
+# example:
+# operators:
+#   - name: username
+#     hashed_password: "<hashed password in crypt format>"
+#     pubkey: "<SSH PUBLIC KEY CONTENT>"
+#     pgpfingerprint: "<FINGERPRINT OF PGP KEY>"
+#     pgpkey: |
+#       <CONTENTS OF PGP PUBLIC KEY>
+operators: []
