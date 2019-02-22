@@ -1,4 +1,5 @@
 ---
+
 haproxy__from_ppa: false
 haproxy__ppa_version: 1.8
 

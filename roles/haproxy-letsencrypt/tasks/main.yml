@@ -1,4 +1,5 @@
 ---
+
 - name: Ensure that haproxy_letsencrypt__domain is set
   assert:
     that: haproxy_letsencrypt__domain is defined
