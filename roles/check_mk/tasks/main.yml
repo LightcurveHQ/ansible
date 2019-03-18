@@ -1,4 +1,5 @@
 ---
+
 - name: Ensure Check_MK agent directories exist
   file:
     path: "{{ item }}"

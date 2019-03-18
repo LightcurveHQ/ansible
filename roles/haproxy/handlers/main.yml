@@ -1,4 +1,5 @@
 ---
+
 - name: Assemble HAProxy configuration
   assemble:
     src: /etc/haproxy/conf.d
