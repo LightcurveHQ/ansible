@@ -43,10 +43,20 @@
     remote_src: true
   notify: Reload HAProxy
 
-- name: Ensure renewal cronjob use http-01 challenge
+- name: Ensure renewal cronjob uses http-01 challenge
   lineinfile:
     path: /etc/cron.d/certbot
     regexp: '^(.*)certbot -q renew$'
     line:
       '\1certbot --http-01-port=8123 --preferred-challenges=http-01 -q renew'
     backrefs: true
+
+- name: Ensure renewal systemd timer uses http-01 challenge
+  lineinfile:
+    path: /lib/systemd/system/certbot.service
+    regexp: '^(.*)certbot -q renew$'
+    line:
+      '\1certbot --http-01-port=8123 --preferred-challenges=http-01 -q renew'
+    backrefs: true
+  notify:
+    - Reload systemd
