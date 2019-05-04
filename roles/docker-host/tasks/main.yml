@@ -27,6 +27,7 @@
     name:
       - docker-ce
       - python-pip
+      - python-setuptools
     state: present
 
 - name: Ensure docker-compose is installed
