@@ -1,0 +1,40 @@
+---
+
+- name: Create server
+  upcloud:
+    state: present
+    hostname: "{{ upcloud_provision__server_name }}"
+    title: "{{ upcloud_provision__server_name }}"
+    zone: "{{ upcloud_provision__zone }}"
+    plan: "{{ upcloud_provision__plan }}"
+    storage_devices:
+      - {size: "{{ upcloud_provision__disk_size }}",
+         os: "{{ upcloud_provision__os|default(upcloud_default_os) }}"}
+    ssh_keys:
+      - "{{ upcloud_provision__ssh_key }}"
+  register: upcloud_server
+
+- name: Get host SSH key
+  command: ssh-keyscan -t ed25519 {{ upcloud_server.public_ip }}
+  changed_when: false
+  register: upcloud_server_keyscan
+  when: upcloud_server.changed
+  tags:
+    - skip_ansible_lint
+
+- name: Update known_hosts
+  known_hosts:
+    state: present
+    host: "{{ upcloud_server.public_ip }}"
+    key: "{{ upcloud_server_keyscan.stdout_lines[-1] }}"
+  when: upcloud_server.changed
+  tags:
+    - skip_ansible_lint
+
+- name: Add server to inventory
+  add_host:
+    name: "{{ upcloud_server.public_ip }}"
+    group: provisioned
+  when: upcloud_server.changed
+  tags:
+    - skip_ansible_lint
