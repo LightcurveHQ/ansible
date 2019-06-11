@@ -82,10 +82,6 @@ options:
     timezone:
         description:
         - Optional string. Timezone in UpCloud.
-    password_delivery:
-        description:
-        - Optional string. Password delivery method. UpCloud Ansible module grabs SSH credentials from API response.
-        - UpCloud's API client defaults to 'none' (as opposed to 'email' or 'sms')
     nic_model:
         description:
         - Optional string. Network adapter in UpCloud.
@@ -284,10 +280,9 @@ def main():
 
             # optional, nice-to-have
             vnc = dict(type='bool'),
-            vnc_password = dict(type='str'),
+            vnc_password = dict(type='str', no_log=True),
             video_model = dict(type='str'),
             timezone = dict(type='str'),
-            password_delivery = dict(type='str'),
             nic_model = dict(type='str'),
             boot_order = dict(type='str'),
             avoid_host = dict(type='str')
