@@ -16,7 +16,9 @@
       - awscli
 
 - name: Import operators PGP keys
-  shell: 'echo "{{ item.pgpkey }}" | gpg2 --import'
+  shell: 'set -o pipefail; echo "{{ item.pgpkey }}" | gpg2 --import'
+  args:
+    executable: /bin/bash
   register: result
   changed_when: "'unchanged: 1' not in result.stderr"
   loop: "{{ operators }}"
