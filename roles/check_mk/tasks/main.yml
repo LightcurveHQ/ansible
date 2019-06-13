@@ -88,7 +88,9 @@
     uid: "{{ cmk_user_id }}"
 
 - name: Ensure checkmk user is unlocked for sshd
-  shell: 'grep ^checkmk /etc/shadow |cut -d ":" -f 2'
+  shell: 'set -o pipefail; grep ^checkmk /etc/shadow |cut -d ":" -f 2'
+  args:
+    executable: /bin/bash
   register: checkmk_password
   changed_when: false
 
