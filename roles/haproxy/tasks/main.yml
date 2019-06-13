@@ -3,7 +3,7 @@
   apt_repository:
     repo: "ppa:vbernat/haproxy-{{ haproxy__ppa_version }}"
     state: present
-  when: haproxy__from_ppa
+  when: haproxy__from_ppa|bool
 
 - name: Ensure HAProxy and socat are installed
   apt:
