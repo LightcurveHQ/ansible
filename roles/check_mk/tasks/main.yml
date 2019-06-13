@@ -98,7 +98,7 @@
   set_fact:
     checkmk_password:
       stdout: "*"
-  when: ansible_check_mode
+  when: ansible_check_mode|bool
 
 - name: Unlock checkmk user password for sshd
   command: usermod -p "*" checkmk
@@ -119,6 +119,6 @@
     key: "{{ lookup('file', 'checkmk.pub') }}"
     key_options: 'command="sudo {{ cmk_bin_path }}"'
     exclusive: true
-  when: not ansible_check_mode
+  when: not ansible_check_mode|bool
 
 - include_tasks: mk_job.yml

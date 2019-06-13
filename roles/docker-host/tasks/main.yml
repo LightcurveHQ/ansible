@@ -39,6 +39,6 @@
   docker_network:
     name: localhost
     driver: bridge
-    ipam_options:
-      subnet: '10.127.0.0/16'
-      gateway: '10.127.0.1'
+    ipam_config:
+      - subnet: '10.127.0.0/16'
+        gateway: '10.127.0.1'
