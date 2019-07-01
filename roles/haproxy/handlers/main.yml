@@ -1,12 +1,5 @@
 ---
 
-- name: Assemble HAProxy configuration
-  assemble:
-    src: /etc/haproxy/conf.d
-    dest: /etc/haproxy/haproxy.cfg
-    validate: 'haproxy -c -f %s'
-  notify: Reload HAProxy
-
 - name: Reload HAProxy
   systemd:
     name: haproxy
