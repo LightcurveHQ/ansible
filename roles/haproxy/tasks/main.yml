@@ -10,7 +10,7 @@
     name:
       - haproxy
       - socat
-    state: present
+    state: latest
 
 - name: Ensure {{ haproxy__ssl_dir }} directory exists
   file:
