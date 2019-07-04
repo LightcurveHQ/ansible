@@ -10,7 +10,7 @@
     name:
       - haproxy
       - socat
-    state: present
+    state: latest
 
 - name: Ensure {{ haproxy__ssl_dir }} directory exists
   file:
@@ -32,7 +32,13 @@
   with_items:
     - 00_global_defaults.cfg
     - 10_stats.cfg
-  notify: Assemble HAProxy configuration
+
+- name: Assemble HAProxy configuration
+  assemble:
+    src: /etc/haproxy/conf.d
+    dest: /etc/haproxy/haproxy.cfg
+    validate: 'haproxy -c -f %s'
+  notify: Reload HAProxy
 
 - name: Check whether check_mk is installed
   stat:
