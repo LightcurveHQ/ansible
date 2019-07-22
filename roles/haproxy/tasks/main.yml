@@ -11,6 +11,8 @@
       - haproxy
       - socat
     state: latest
+  tags:
+    - skip_ansible_lint
 
 - name: Ensure {{ haproxy__ssl_dir }} directory exists
   file:
