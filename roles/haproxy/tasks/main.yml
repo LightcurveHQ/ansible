@@ -22,6 +22,11 @@
     group: root
     mode: 0750
 
+- name: Ensure dh-param file exists
+  shell: openssl dhparam 2048 >{{ haproxy__ssl_dir }}/dh-param.pem
+  args:
+    creates: "{{ haproxy__ssl_dir }}/dh-param.pem"
+
 - name: Ensure HAProxy configuration directory exists
   file:
     path: /etc/haproxy/conf.d
