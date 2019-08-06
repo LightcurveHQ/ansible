@@ -43,6 +43,10 @@ elif [ "$SSH_CLIENT" ] ; then
     export REMOTE=${SSH_CLIENT%% *}
 fi
 
+# The package name gets patched for baked agents to either
+# "check-mk-agent" or the name set by the "name of agent packages" rule
+XINETD_SERVICE_NAME=check_mk
+
 # Make sure, locally installed binaries are found
 PATH=$PATH:/usr/local/bin
 
@@ -348,7 +352,7 @@ function run_real_time_checks()
 }
 
 echo '<<<check_mk>>>'
-echo Version: 1.5.0p9
+echo Version: 1.5.0p21
 echo "AgentOS: linux"
 echo "Hostname: $HOSTNAME"
 echo "AgentDirectory: $MK_CONFDIR"
@@ -361,7 +365,7 @@ echo "LocalDirectory: $LOCALDIR"
 if [ -n "$REMOTE_HOST" ]
 then
     echo -n 'OnlyFrom: '
-    sed -n '/^service[[:space:]]*check_mk/,/}/s/^[[:space:]]*only_from[[:space:]]*=[[:space:]]*\(.*\)/\1/p' /etc/xinetd.d/* | head -n1; echo
+    sed -n '/^service[[:space:]]*'$XINETD_SERVICE_NAME'/,/}/s/^[[:space:]]*only_from[[:space:]]*=[[:space:]]*\(.*\)/\1/p' /etc/xinetd.d/* | head -n1; echo
 fi
 
 section_df
@@ -369,8 +373,7 @@ section_df
 # Filesystem usage for ZFS
 if type zfs > /dev/null 2>&1 ; then
     echo '<<<zfsget>>>'
-    zfs get -Hp name,quota,used,avail,mountpoint,type -t filesystem,volume || \
-       zfs get -Hp name,quota,used,avail,mountpoint,type
+    zfs get -t filesystem,volume -Hp name,quota,used,avail,mountpoint,type 2>/dev/null
     echo '[df]'
     df -PTlk -t zfs | sed 1d
 fi
@@ -474,13 +477,13 @@ fi
 
 
 # Number of TCP connections in the various states
-echo '<<<tcp_conn_stats>>>'
-if type ss > /dev/null ; then
-    ss -ant |grep -v ^State | awk ' /:/ { c[$1]++; } END { for (x in c) { print x, c[x]; } }' |sed -e 's/^ESTAB/01/g;s/^SYN-SENT/02/g;s/^SYN-RECV/03/g;s/^FIN-WAIT-1/04/g;s/^FIN-WAIT-2/05/g;s/^TIME-WAIT/06/g;s/^CLOSED/07/g;s/^CLOSE-WAIT/08/g;s/^LAST-ACK/09/g;s/^LISTEN/0A/g;s/^CLOSING/0B/g;'
-elif type waitmax >/dev/null ; then
-    THIS=$(waitmax -s 1 10 cat /proc/net/tcp /proc/net/tcp6 2>/dev/null | awk ' /:/ { c[$4]++; } END { for (x in c) { print x, c[x]; } }')
+if type waitmax >/dev/null ; then
+    echo '<<<tcp_conn_stats>>>'
+    THIS=$(waitmax 5 cat /proc/net/tcp /proc/net/tcp6 2>/dev/null | awk ' /:/ { c[$4]++; } END { for (x in c) { print x, c[x]; } }')
     if [ $? == 0 ] ; then
         echo "$THIS"
+    elif type ss > /dev/null ; then
+        ss -ant |grep -v ^State | awk ' /:/ { c[$1]++; } END { for (x in c) { print x, c[x]; } }' | sed -e 's/^ESTAB/01/g;s/^SYN-SENT/02/g;s/^SYN-RECV/03/g;s/^FIN-WAIT-1/04/g;s/^FIN-WAIT-2/05/g;s/^TIME-WAIT/06/g;s/^CLOSED/07/g;s/^CLOSE-WAIT/08/g;s/^LAST-ACK/09/g;s/^LISTEN/0A/g;s/^CLOSING/0B/g;'
     fi
 fi
 
@@ -539,7 +542,7 @@ fi
 
 # IPMI data via ipmi-sensors (of freeipmi). Please make sure, that if you
 # have installed freeipmi that IPMI is really support by your hardware.
-if type ipmi-sensors >/dev/null
+if (type ipmi-sensors && ls /dev/ipmi*) &>/dev/null
 then
     echo '<<<ipmi_sensors>>>'
     # Newer ipmi-sensors version have new output format; Legacy format can be used
@@ -956,7 +959,7 @@ if pushd "$MK_VARDIR/job" >/dev/null; then
     do
         if [ -d "$username" ] && cd "$username" ; then
             if [ $EUID -eq 0 ]; then
-                su "$username" -c "head -n -0 -v *"
+                su -s "$SHELL" "$username" -c "head -n -0 -v *"
             else
                 head -n -0 -v ./*
             fi
@@ -999,32 +1002,6 @@ if type pvecm > /dev/null 2>&1 ; then
     pvecm status
     echo "<<<pvecm_nodes>>>"
     pvecm nodes
-fi
-
-# Iterate all running containers and report piggyback data for them
-if type docker > /dev/null 2>&1 && [ -z "$MK_IS_PIGGYBACKED" ]; then
-    echo "<<<docker_node_info:sep(58)>>>"
-    # sed: protect leading whitespace
-    docker info | sed 's/^/|/'
-
-    echo "<<<docker_node_disk_usage:sep(0)>>>"
-    docker system df
-
-    echo "<<<docker_node_images>>>"
-    echo "[[[images]]]"
-    docker images --format "{{json .}}"
-
-    echo "[[[image_inspect]]]"
-    IMAGE_IDS=$(docker images | awk 'NR>1 {print $3}')
-    docker image inspect $IMAGE_IDS
-
-    echo "[[[containers]]]"
-    # equivalent of 'docker ps' for newer docker versions: 'docker container ls'
-    docker ps --all --format "{{json .}}"
-
-    echo "<<<docker_node_network:sep(0)>>>"
-    NETWORK_IDS=$(docker network ls -f 'driver=bridge' | awk 'NR>1 {print $1}')
-    docker network inspect $NETWORK_IDS
 fi
 
 # Start new liveupdate process in background on each agent execution. Starting
@@ -1194,9 +1171,8 @@ if cd "$PLUGINSDIR"; then
 fi
 
 # Agent output snippets created by cronjobs, etc.
-if [ -d "$SPOOLDIR" ]
-then
-    pushd "$SPOOLDIR" > /dev/null
+if [ -d "$SPOOLDIR" ] && [ -r "$SPOOLDIR" ]; then
+    pushd "$SPOOLDIR" >/dev/null
     now=$(date +%s)
 
     for file in *
