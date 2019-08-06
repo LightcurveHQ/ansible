@@ -5,6 +5,8 @@
   apt:
     name: time
     state: present
+  register: apt_status
+  until: apt_status is succeeded
 
 - name: Ensure mk-job is installed
   copy:
