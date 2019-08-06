@@ -42,3 +42,18 @@
     ipam_config:
       - subnet: '10.127.0.0/16'
         gateway: '10.127.0.1'
+
+- name: Check whether check_mk is installed
+  stat:
+    path: "{{ cmk_usr_dir }}"
+  changed_when: false
+  register: cmk_path
+
+- name: Ensure mk_haproxy is installed
+  copy:
+    src: mk_docker_node
+    dest: "{{ cmk_usr_dir }}/plugins/mk_docker_node"
+    owner: root
+    group: root
+    mode: 0755
+  when: cmk_path.stat.exists
