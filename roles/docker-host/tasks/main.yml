@@ -22,10 +22,12 @@
     state: present
     update_cache: true
 
-- name: Ensure docker-ce and pip are installed
+- name: Ensure docker-ce, python bindings and pip are installed
   apt:
     name:
       - docker-ce
+      - python-docker
+      - python3-docker
       - python3-pip
       - python3-setuptools
     state: present
@@ -49,10 +51,15 @@
   changed_when: false
   register: cmk_path
 
-- name: Ensure mk_haproxy is installed
+- name: Ensure mk_docker_node is removed
+  file:
+    state: absent
+    path: "{{ cmk_usr_dir }}/plugins/mk_docker_node"
+
+- name: Ensure mk_docker.py is installed
   copy:
-    src: mk_docker_node
-    dest: "{{ cmk_usr_dir }}/plugins/mk_docker_node"
+    src: mk_docker.py
+    dest: "{{ cmk_usr_dir }}/plugins/mk_docker.py"
     owner: root
     group: root
     mode: 0755
