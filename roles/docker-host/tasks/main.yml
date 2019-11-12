@@ -26,6 +26,8 @@
   apt:
     name:
       - docker-ce
+      - pass  # workaround for
+      # https://bugs.launchpad.net/ubuntu/+source/docker-compose/+bug/1796119
       - python-docker
       - python3-docker
       - python3-pip
