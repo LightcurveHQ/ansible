@@ -1,0 +1,9 @@
+[Unit]
+Description=A reverse proxy that provides authentication with Google, Github or other provider
+
+[Service]
+ExecStart=/usr/local/bin/oauth2_proxy -config=/usr/local/etc/oauth2_proxy.cfg
+User=oauth2_proxy
+
+[Install]
+WantedBy=multi-user.target
