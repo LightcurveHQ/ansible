@@ -29,12 +29,16 @@
   file:
     path: /usr/local/bin/oauth2_proxy
     state: absent
-  when: not ansible_check_mode|bool and oauth2_proxy_stat.stat.checksum != oauth2_proxy__binary_sha256sum
+  when: >
+    not ansible_check_mode|bool and
+    oauth2_proxy_stat.stat.checksum != oauth2_proxy__binary_sha256sum
 
 - name: Fail if checksum does not match
   fail:
     msg: "Wrong checksum of oauth2_proxy"
-  when: not ansible_check_mode|bool and oauth2_proxy_stat.stat.checksum != oauth2_proxy__binary_sha256sum
+  when: >
+    not ansible_check_mode|bool and
+    oauth2_proxy_stat.stat.checksum != oauth2_proxy__binary_sha256sum
 
 - name: Ensure oauth2_proxy service exists
   copy:
