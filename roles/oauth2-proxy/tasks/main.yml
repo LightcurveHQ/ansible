@@ -1,0 +1,44 @@
+---
+
+- name: Ensure oauth2_proxy group exists
+  group:
+    name: oauth2_proxy
+    state: present
+
+- name: Ensure oauth2_proxy user exists
+  user:
+    name: oauth2_proxy
+    shell: /usr/sbin/nologin
+    group: oauth2_proxy
+
+- name: Install oauth2_proxy
+  get_url:
+    url: "{{ oauth2_proxy_url }}"
+    dest: /usr/local/bin/oauth2_proxy
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Compute checksum of oauth2_proxy
+  stat:
+    path: /usr/local/bin/oauth2_proxy
+    checksum_algorithm: sha256
+  register: oauth2_proxy_stat
+
+- name: Remove oauth2_proxy if its checksum does not match
+  file:
+    path: /usr/local/bin/oauth2_proxy
+    state: absent
+  when: not ansible_check_mode|bool and oauth2_proxy_stat.stat.checksum != oauth2_proxy__binary_sha256sum
+
+- name: Fail if checksum does not match
+  fail:
+    msg: "Wrong checksum of oauth2_proxy"
+  when: not ansible_check_mode|bool and oauth2_proxy_stat.stat.checksum != oauth2_proxy__binary_sha256sum
+
+- name: Ensure oauth2_proxy service exists
+  copy:
+    src: oauth2_proxy.service
+    dest: /etc/systemd/system/oauth2_proxy.service
+  notify:
+    - Reload systemd
