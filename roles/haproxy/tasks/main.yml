@@ -1,4 +1,5 @@
 ---
+
 - name: Ensure HAProxy PPA is setup
   apt_repository:
     repo: "ppa:vbernat/haproxy-{{ haproxy__ppa_version }}"
@@ -61,27 +62,3 @@
     group: root
     mode: 0755
   when: cmk_path.stat.exists
-
-- name: Ensure haproxy_exporter is installed
-  get_url:
-    url: "{{ binary_mirror }}/dist/haproxy_exporter-\
-    {{ haproxy__haproxy_exporter_version }}"
-    dest: /usr/local/bin/haproxy_exporter
-    sha256sum: "{{ haproxy__haproxy_exporter_sha256sum }}"
-    owner: root
-    group: root
-    mode: 0755
-
-- name: Ensure haproxy_exporter service exists
-  template:
-    src: haproxy_exporter.service.j2
-    dest: /etc/systemd/system/haproxy_exporter.service
-  notify:
-    - Reload systemd
-    - Restart haproxy_exporter
-
-- name: Ensure haproxy_exporter service is started
-  systemd:
-    name: haproxy_exporter.service
-    state: started
-    enabled: true

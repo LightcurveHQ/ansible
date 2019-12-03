@@ -4,4 +4,9 @@ listen stats
     stats enable
     stats uri /
 
+listen metrics
+    bind {{ haproxy__metrics_bind }}
+    option http-use-htx
+    http-request use-service prometheus-exporter if { path /metrics }
+
 
