@@ -1,5 +1,11 @@
 ---
 
+- name: Check whether check_mk is installed
+  stat:
+    path: "{{ cmk_usr_dir }}"
+  changed_when: false
+  register: cmk_path
+
 - include_tasks: bionic.yml
   when: ansible_distribution == "Ubuntu" and ansible_lsb.major_release|int <= 18
 
@@ -18,12 +24,6 @@
     ipam_config:
       - subnet: '10.127.0.0/16'
         gateway: '10.127.0.1'
-
-- name: Check whether check_mk is installed
-  stat:
-    path: "{{ cmk_usr_dir }}"
-  changed_when: false
-  register: cmk_path
 
 - name: Ensure mk_docker_node is removed
   file:
