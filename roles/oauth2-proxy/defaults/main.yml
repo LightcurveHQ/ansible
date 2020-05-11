@@ -1,6 +1,6 @@
 ---
 
-oauth2_proxy__version: 5.1.0
-oauth2_proxy__version_long: "{{ oauth2_proxy__version }}.linux-amd64.go1.14"
+oauth2_proxy__version: 5.1.1
+oauth2_proxy__version_long: "{{ oauth2_proxy__version }}.linux-amd64.go1.14.2"
 oauth2_proxy__binary_sha256sum: >-
-  9b18875191c32e80338a9f59142f7673363fb1fdd4774ea42727148834040e56
+  4afcbf1a43b5088b24f934308d0090ff32607256962c647e10d20071ad4f9273
