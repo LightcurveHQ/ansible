@@ -4,6 +4,7 @@
   apt_repository:
     state: present
     repo: 'ppa:certbot/certbot'
+  when: ansible_distribution == "Ubuntu" and ansible_lsb.major_release|int < 20
 
 - name: Ensure certbot is installed
   apt:
