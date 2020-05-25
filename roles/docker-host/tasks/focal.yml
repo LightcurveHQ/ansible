@@ -22,3 +22,8 @@
     group: root
     mode: 0755
   when: cmk_path.stat.exists
+
+- name: Esnure mk_docker.py is configured
+  copy:
+    src: docker.cfg
+    dest: /etc/check_mk/docker.cfg
