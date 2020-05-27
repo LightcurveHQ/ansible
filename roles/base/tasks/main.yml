@@ -32,3 +32,8 @@
 - name: Set timezone to UTC
   timezone:
     name: UTC
+
+- name: Ensure setfacl is installed
+  package:
+    state: present
+    name: acl
