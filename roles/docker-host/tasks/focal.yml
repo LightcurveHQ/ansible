@@ -1,9 +1,9 @@
 ---
 
-- name: Ensure docker.io, python bindings are installed
+- name: Ensure docker-ce, python bindings and pip are installed
   apt:
     name:
-      - docker.io
+      - docker-ce
       - python3-docker
       - python3-pip
       - python3-setuptools
@@ -23,7 +23,7 @@
     mode: 0755
   when: cmk_path.stat.exists
 
-- name: Esnure mk_docker.py is configured
+- name: Ensure mk_docker.py is configured
   copy:
     src: docker.cfg
     dest: /etc/check_mk/docker.cfg
