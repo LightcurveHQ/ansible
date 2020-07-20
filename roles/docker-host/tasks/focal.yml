@@ -23,6 +23,11 @@
     mode: 0755
   when: cmk_path.stat.exists
 
+- name: Ensure /etc/check_mk directory exists
+  file:
+    state: directory
+    path: /etc/check_mk
+
 - name: Ensure mk_docker.py is configured
   copy:
     src: docker.cfg
