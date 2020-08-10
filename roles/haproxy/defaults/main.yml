@@ -1,7 +1,7 @@
 ---
 
 haproxy__from_ppa: true
-haproxy__ppa_version: 2.1
+haproxy__ppa_version: 2.2
 
 haproxy__combined_certificate: combined.pem
 haproxy__ssl_dir: /etc/haproxy/ssl
