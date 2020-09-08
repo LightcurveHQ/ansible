@@ -3,4 +3,4 @@
 oauth2_proxy__version: 6.1.1
 oauth2_proxy__version_long: "{{ oauth2_proxy__version }}.linux-amd64"
 oauth2_proxy__binary_sha256sum: >-
-  a661d59c55cfcc2b46ae1f0b24a3e8a2ced5413f931b8b05f7bf4e867c70d912
+  c288830f418efa696e7909d9e9bded5f1266f186c56f3f776ad4e055ead7b64a
