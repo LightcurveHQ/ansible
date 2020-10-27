@@ -14,31 +14,13 @@
 - name: Install oauth2_proxy
   get_url:
     url: "{{ oauth2_proxy_url }}"
+    checksum: sha256:{{ oauth2_proxy__binary_sha256sum }}
     dest: /usr/local/bin/oauth2_proxy
     owner: root
     group: root
     mode: 0755
-
-- name: Compute checksum of oauth2_proxy
-  stat:
-    path: /usr/local/bin/oauth2_proxy
-    checksum_algorithm: sha256
-  register: oauth2_proxy_stat
-
-- name: Remove oauth2_proxy if its checksum does not match
-  file:
-    path: /usr/local/bin/oauth2_proxy
-    state: absent
-  when: >
-    not ansible_check_mode|bool and
-    oauth2_proxy_stat.stat.checksum != oauth2_proxy__binary_sha256sum
-
-- name: Fail if checksum does not match
-  fail:
-    msg: "Wrong checksum of oauth2_proxy"
-  when: >
-    not ansible_check_mode|bool and
-    oauth2_proxy_stat.stat.checksum != oauth2_proxy__binary_sha256sum
+  register: get_url_status
+  until: get_url_status is succeeded
 
 - name: Ensure oauth2_proxy service exists
   copy:
