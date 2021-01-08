@@ -26,5 +26,8 @@
   copy:
     src: oauth2_proxy.service
     dest: /etc/systemd/system/oauth2_proxy.service
+    owner: root
+    group: root
+    mode: 0644
   notify:
     - Reload systemd

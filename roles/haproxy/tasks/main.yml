@@ -32,11 +32,17 @@
   file:
     path: /etc/haproxy/conf.d
     state: directory
+    owner: root
+    group: root
+    mode: 0755
 
 - name: Ensure HAProxy is configured
   template:
     src: "{{ item }}.j2"
     dest: /etc/haproxy/conf.d/{{ item }}
+    owner: root
+    group: root
+    mode: 0644
   with_items:
     - 00_global_defaults.cfg
     - 10_stats.cfg
@@ -46,6 +52,9 @@
     src: /etc/haproxy/conf.d
     dest: /etc/haproxy/haproxy.cfg
     validate: 'haproxy -c -f %s'
+    owner: root
+    group: root
+    mode: 0640
   notify: Reload HAProxy
 
 - name: Check whether check_mk is installed

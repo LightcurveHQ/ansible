@@ -27,8 +27,14 @@
   file:
     state: directory
     path: /etc/check_mk
+    owner: root
+    group: root
+    mode: 0755
 
 - name: Ensure mk_docker.py is configured
   copy:
     src: docker.cfg
     dest: /etc/check_mk/docker.cfg
+    owner: root
+    group: root
+    mode: 0644

@@ -41,6 +41,9 @@
     src: /etc/haproxy/ssl/combined.pem.new
     dest: /etc/haproxy/ssl/combined.pem
     remote_src: true
+    owner: root
+    group: root
+    mode: 0640
   notify: Reload HAProxy
 
 - name: Ensure renewal cronjob uses http-01 challenge
