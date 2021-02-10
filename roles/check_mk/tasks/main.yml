@@ -31,7 +31,7 @@
     state: directory
     owner: root
     group: root
-    mode: 0600
+    mode: 0755
 
 - name: Ensure Check_MK agent configuration exist
   copy:
@@ -39,7 +39,7 @@
     dest: "{{ cmk_config_dir }}/{{ item }}"
     owner: root
     group: root
-    mode: 0600
+    mode: 0644
   with_items:
     - logwatch.cfg
 
