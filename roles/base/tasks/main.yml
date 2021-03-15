@@ -31,7 +31,7 @@
 
 - name: Set timezone to UTC
   timezone:
-    name: UTC
+    name: Etc/UTC
 
 - name: Ensure setfacl is installed
   package:
