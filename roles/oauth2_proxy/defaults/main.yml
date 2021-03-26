@@ -1,6 +1,6 @@
 ---
 
-oauth2_proxy__version: 7.0.1
+oauth2_proxy__version: 7.1.0
 oauth2_proxy__version_long: "{{ oauth2_proxy__version }}.linux-amd64"
 oauth2_proxy__binary_sha256sum: >-
-  60d780f6b715a8896b8f260357f38e2398b2b9f1539b308af66521010829473e
+  bf1a0c0dfbbafca98624119643539d5b7aa8b56da9947638d529c68df17114de
