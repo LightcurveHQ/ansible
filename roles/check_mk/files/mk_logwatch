@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # Copyright (C) 2019 tribe29 GmbH - License: GNU General Public License v2
 # This file is part of Checkmk (https://checkmk.com). It is subject to the terms and
@@ -20,11 +20,14 @@ You should find an example configuration file at
 
 from __future__ import with_statement
 
+__version__ = "2.0.0p1"
+
 import sys
 if sys.version_info < (2, 6):
     sys.stderr.write("ERROR: Python 2.5 is not supported. Please use Python 2.6 or newer.\n")
     sys.exit(1)
 
+import io
 import glob
 import logging
 import os
@@ -38,6 +41,16 @@ import locale
 import ast
 
 import shlex
+
+# For Python 3 sys.stdout creates \r\n as newline for Windows.
+# Checkmk can't handle this therefore we rewrite sys.stdout to a new_stdout function.
+# If you want to use the old behaviour just use old_stdout.
+if sys.version_info[0] >= 3:
+    new_stdout = io.TextIOWrapper(sys.stdout.buffer,
+                                  newline='\n',
+                                  encoding=sys.stdout.encoding,
+                                  errors=sys.stdout.errors)
+    old_stdout, sys.stdout = sys.stdout, new_stdout
 
 MK_VARDIR = os.getenv("LOGWATCH_DIR") or os.getenv("MK_VARDIR") or os.getenv("MK_STATEDIR") or "."
 
@@ -72,7 +85,7 @@ if PY3:
     text_type = str
     binary_type = bytes
 else:
-    text_type = unicode
+    text_type = unicode  # pylint: disable=undefined-variable
     binary_type = str
 
 
@@ -107,7 +120,7 @@ def init_logging(verbosity):
         logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(lineno)s: %(message)s")
 
 
-class ArgsParser(object):  # pylint: disable=too-few-public-methods
+class ArgsParser(object):  # pylint: disable=too-few-public-methods, useless-object-inheritance
     """
     Custom argument parsing.
     (Neither use optparse which is Python 2.3 to 2.7 only.
@@ -139,7 +152,7 @@ class ArgsParser(object):  # pylint: disable=too-few-public-methods
 # up to prevent eating disk space over time.
 
 
-class MEIFolderCleaner(object):
+class MEIFolderCleaner(object):  # pylint: disable=useless-object-inheritance
     def pid_running(self, pid):
         import ctypes
         kernel32 = ctypes.windll.kernel32  # type: ignore[attr-defined]
@@ -390,7 +403,7 @@ def read_config(files, debug=False):
     return logfiles_configs, cluster_configs
 
 
-class State(object):
+class State(object):  # pylint: disable=useless-object-inheritance
     def __init__(self, filename, data=None):
         super(State, self).__init__()
         self.filename = filename
@@ -436,7 +449,7 @@ class State(object):
         return self._data.setdefault(key, {'file': key})
 
 
-class LogLinesIter(object):
+class LogLinesIter(object):  # pylint: disable=useless-object-inheritance
     # this is supposed to become a proper iterator.
     # for now, we need a persistent buffer to fix things
     BLOCKSIZE = 8192
@@ -671,7 +684,7 @@ def process_logfile(section, filestate, debug):
                             cont_line = log_iter.next_line()
                             if cont_line is None:  # end of file
                                 break
-                            elif cont_pattern.search(cont_line[:-1]):
+                            if cont_pattern.search(cont_line[:-1]):
                                 line = line[:-1] + "\1" + cont_line
                             else:
                                 log_iter.push_back_line(cont_line)  # sorry for stealing this line
@@ -717,7 +730,7 @@ def process_logfile(section, filestate, debug):
     return header, []
 
 
-class Options(object):
+class Options(object):  # pylint: disable=useless-object-inheritance
     """Options w.r.t. logfile patterns (not w.r.t. cluster mapping)."""
     MAP_OVERFLOW = {'C': 2, 'W': 1, 'I': 0, 'O': 0}
     MAP_BOOL = {'true': True, 'false': False, '1': True, '0': False, 'yes': True, 'no': False}
@@ -808,7 +821,7 @@ class Options(object):
                 if value not in Options.MAP_OVERFLOW.keys():
                     raise ValueError("Invalid overflow: %r (choose from %r)" % (
                         value,
-                        Options.MAP_OVERFLOW.keys(),
+                        Options.MAP_OVERFLOW.keys(),  # pylint: disable=dict-keys-not-iterating
                     ))
                 self.values['overflow'] = value
             elif key in ('regex', 'iregex'):
@@ -819,7 +832,7 @@ class Options(object):
                     raise ValueError("Invalid %s: %r (choose from %r)" % (
                         key,
                         value,
-                        Options.MAP_BOOL.keys(),
+                        Options.MAP_BOOL.keys(),  # pylint: disable=dict-keys-not-iterating
                     ))
                 self.values[key] = Options.MAP_BOOL[value.lower()]
             elif key == 'maxcontextlines':
@@ -832,14 +845,14 @@ class Options(object):
             raise
 
 
-class PatternConfigBlock(object):
+class PatternConfigBlock(object):  # pylint: disable=useless-object-inheritance
     def __init__(self, files, patterns):
         super(PatternConfigBlock, self).__init__()
         self.files = files
         self.patterns = patterns
 
 
-class ClusterConfigBlock(object):
+class ClusterConfigBlock(object):  # pylint: disable=useless-object-inheritance
     def __init__(self, name, ips_or_subnets):
         super(ClusterConfigBlock, self).__init__()
         self.name = name
@@ -852,7 +865,7 @@ def _decode_to_unicode(match):
     # we can't use 'six': this code may be executed using Python 2.5/2.6
     if sys.version_info[0] == 2:
         # Python 2: str @Windows && @Linux
-        return match if isinstance(match, unicode) else match.decode('utf8', 'replace')
+        return match if isinstance(match, unicode) else match.decode('utf8', 'replace')  # pylint: disable=undefined-variable
 
     # Python 3: bytes @Linux and unicode @Windows
     return match.decode('utf-8', 'replace') if isinstance(match, bytes) else match
@@ -885,13 +898,11 @@ def find_matching_logfiles(glob_pattern):
         # we can't use glob on unicode, as it would try to re-decode matches with ascii
         matches = glob.glob(glob_pattern.encode('utf8'))
 
-    # skip dirs and read links
+    # skip dirs
     file_refs = []
     for match in matches:
         if os.path.isdir(match):
             continue
-        if os.path.islink(match):
-            match = os.readlink(match)
 
         # match is bytes in Linux and unicode/str in Windows
         match_readable = _decode_to_unicode(match)
@@ -919,7 +930,7 @@ def _compile_continuation_pattern(raw_pattern):
         return re.compile(_search_optimize_raw_pattern(raw_pattern), re.UNICODE)
 
 
-class LogfileSection(object):
+class LogfileSection(object):  # pylint: disable=useless-object-inheritance
     def __init__(self, logfile_ref):
         super(LogfileSection, self).__init__()
         self.name_fs = logfile_ref[0]
@@ -1035,11 +1046,11 @@ def _subnetwork_to_ip_range(subnetwork):
     raise ValueError("invalid subnetwork: %r" % subnetwork)
 
 
-def _filter_maxoutputsize(encoded_lines, maxoutputsize):
+def _filter_maxoutputsize(lines, maxoutputsize):
     """Produce lines right *before* maxoutputsize is exceeded"""
     bytecount = 0
-    for line in encoded_lines:
-        bytecount += len(line)
+    for line in lines:
+        bytecount += len(line.encode('utf-8'))
         if bytecount > maxoutputsize:
             break
         yield line
@@ -1070,18 +1081,10 @@ def write_output(header, lines, options):
     if options.maxcontextlines:
         lines = _filter_maxcontextlines(lines, *options.maxcontextlines)
 
-    if sys.version_info[0] == 3:
-        # in Python 3 we use 100% unicode and hope that this is good idea
-        sys.stdout.write(header)
-        filtered_enc_lines = _filter_maxoutputsize(lines, options.maxoutputsize)
-    else:
-        # Original strange code for Python 2
-        encoded_lines = (l.encode('utf-8') for l in lines)
-        sys.stdout.write(header.encode('utf-8'))
-        filtered_enc_lines = _filter_maxoutputsize(encoded_lines, options.maxoutputsize)
+    lines = _filter_maxoutputsize(lines, options.maxoutputsize)
 
-    for line in filtered_enc_lines:
-        sys.stdout.write(line)
+    sys.stdout.write(header)
+    sys.stdout.writelines(lines)
 
 
 def main(argv=None):
