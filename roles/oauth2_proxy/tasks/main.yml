@@ -21,6 +21,8 @@
     mode: 0755
   register: get_url_status
   until: get_url_status is succeeded
+  notify:
+    - Restart oauth2_proxy
 
 - name: Ensure oauth2_proxy service exists
   copy:
