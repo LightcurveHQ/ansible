@@ -1,3 +1,4 @@
 ---
 
-varnish___vcl_template_path: default.vcl.j2
+varnish__systemd_conf_path: default_varnish_systemd.conf
+varnish__vcl_template_path: default.vcl.j2

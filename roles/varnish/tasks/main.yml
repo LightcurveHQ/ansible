@@ -31,7 +31,7 @@
 
 - name: Configure varnish systemd service
   copy:
-    src: varnish_systemd.conf
+    src: "{{ varnish__systemd_conf_path }}"
     dest: /etc/systemd/system/varnish.service.d/varnish_systemd.conf
     owner: root
     group: root
