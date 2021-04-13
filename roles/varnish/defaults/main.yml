@@ -1,0 +1,3 @@
+---
+
+varnish___vcl_template_path: default.vcl.j2

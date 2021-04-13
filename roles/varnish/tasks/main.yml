@@ -42,7 +42,7 @@
 
 - name: Configure varnish
   template:
-    src: default.vcl.j2
+    src: "{{ varnish__vcl_template_path }}"
     dest: /etc/varnish/default.vcl
     owner: root
     group: root
