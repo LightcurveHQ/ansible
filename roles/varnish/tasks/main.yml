@@ -1,0 +1,50 @@
+---
+
+- name: Ensure varnish has been installed
+  apt:
+    state: present
+    name: varnish
+
+- name: Ensure /etc/systemd/system/{{ item }}.service.d exists
+  file:
+    path: /etc/systemd/system/{{ item }}.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - varnish
+    - varnishncsa
+
+- name: Ensure {{ item }} systemd service starts after docker
+  copy:
+    src: 90-after-docker.conf
+    dest: /etc/systemd/system/{{ item }}.service.d/90-after-docker.conf
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - varnish
+    - varnishncsa
+  notify:
+    - Reload systemd
+
+- name: Configure varnish systemd service
+  copy:
+    src: varnish_systemd.conf
+    dest: /etc/systemd/system/varnish.service.d/varnish_systemd.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - Reload systemd
+    - Restart varnish
+
+- name: Configure varnish
+  template:
+    src: default.vcl.j2
+    dest: /etc/varnish/default.vcl
+    owner: root
+    group: root
+    mode: 0644
+  notify: Reload varnish
