@@ -1,0 +1,29 @@
+---
+
+- name: Ensure varnish_exporter is installed
+  get_url:
+    url: "{{ varnish_exporter_url }}"
+    dest: "{{ varnish_exporter__path }}"
+    checksum: sha256:{{ varnish_exporter__sha256sum }}
+    owner: root
+    group: root
+    mode: 0755
+  notify:
+    - Restart varnish_exporter
+
+- name: Ensure varnish_exporter service exists
+  template:
+    src: varnish_exporter.service.j2
+    dest: /etc/systemd/system/varnish_exporter.service
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - Reload systemd
+    - Restart varnish_exporter
+
+- name: Ensure varnish_exporter service is started
+  systemd:
+    name: varnish_exporter.service
+    state: started
+    enabled: yes

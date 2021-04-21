@@ -14,3 +14,8 @@
   systemd:
     name: varnish
     state: restarted
+
+- name: Restart varnish_exporter
+  systemd:
+    name: varnish_exporter
+    state: restarted
