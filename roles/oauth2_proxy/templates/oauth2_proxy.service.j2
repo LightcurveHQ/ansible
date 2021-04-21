@@ -2,7 +2,7 @@
 Description=A reverse proxy that provides authentication with Google, Github or other provider
 
 [Service]
-ExecStart=/usr/local/bin/oauth2_proxy --config=/usr/local/etc/oauth2_proxy.cfg
+ExecStart=/usr/local/bin/oauth2_proxy --config=/usr/local/etc/oauth2_proxy.cfg --metrics-address={{ oauth2_proxy__prometheus_bind }}
 User=oauth2_proxy
 
 [Install]
