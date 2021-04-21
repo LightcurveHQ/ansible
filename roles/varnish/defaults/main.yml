@@ -2,3 +2,11 @@
 
 varnish__systemd_conf_path: default_varnish_systemd.conf
 varnish__vcl_template_path: default.vcl.j2
+
+varnish_exporter__version: 1.6
+varnish_exporter__sha256sum: >-
+  a8fa62db82c42c79bb3dbab959ae14fac9089a89fd4fa19fd1d3bf6f958f561e
+
+varnish_exporter__ip: 127.0.0.1
+varnish_exporter__path: /usr/local/bin/varnish_exporter
+varnish_exporter__options: -web.listen-address "{{ varnish_exporter__ip }}:9131"

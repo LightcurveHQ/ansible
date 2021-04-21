@@ -1,0 +1,13 @@
+[Unit]
+Description=Prometheus Exporter for Varnish Metrics
+StartLimitIntervalSec=10
+StartLimitBurst=2
+
+[Service]
+ExecStart={{ varnish_exporter__path }} {{ varnish_exporter__options }}
+User=nobody
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
