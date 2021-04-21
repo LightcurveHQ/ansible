@@ -25,11 +25,12 @@
     - Restart oauth2_proxy
 
 - name: Ensure oauth2_proxy service exists
-  copy:
-    src: oauth2_proxy.service
+  template:
+    src: oauth2_proxy.service.j2
     dest: /etc/systemd/system/oauth2_proxy.service
     owner: root
     group: root
     mode: 0644
   notify:
     - Reload systemd
+    - Restart oauth2_proxy
