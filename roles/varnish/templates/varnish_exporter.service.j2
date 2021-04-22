@@ -5,7 +5,7 @@ StartLimitBurst=2
 
 [Service]
 ExecStart={{ varnish_exporter__path }} {{ varnish_exporter__options }}
-User=nobody
+User=varnish
 Restart=always
 RestartSec=10
 
