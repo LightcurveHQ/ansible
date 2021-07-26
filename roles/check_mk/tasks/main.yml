@@ -73,6 +73,15 @@
   with_items:
     - check_reboot
 
+# check_apt requires /usr/lib/update-notifier/apt-check
+# from the update-notifier-common package
+- name: Ensure update-notifier-common is installed
+  package:
+    state: present
+    name: update-notifier-common
+  register: apt_status
+  until: apt_status is succeeded
+
 - name: Ensure CheckMK agent APT check is installed (Ubuntu)
   copy:
     src: check_apt
