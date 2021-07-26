@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # pylint: disable=C0103
 """Report updates using Ubuntu's apt-check"""
 
