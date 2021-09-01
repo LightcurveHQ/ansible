@@ -71,3 +71,19 @@
     group: root
     mode: 0755
   when: cmk_path.stat.exists
+
+- name: Ensure /etc/systemd/system/haproxy.service.d/ exists
+  file:
+    state: directory
+    path: /etc/systemd/system/haproxy.service.d/
+    mode: 0644
+
+- name: Ensure haproxy systemd service restarts on failure
+  copy:
+    src: 90-retry-restart.conf
+    dest: /etc/systemd/system/haproxy.service.d/90-retry-restart.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - Reload systemd
