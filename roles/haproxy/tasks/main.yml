@@ -76,7 +76,7 @@
   file:
     state: directory
     path: /etc/systemd/system/haproxy.service.d/
-    mode: 0644
+    mode: 0755
 
 - name: Ensure haproxy systemd service restarts on failure
   copy:
