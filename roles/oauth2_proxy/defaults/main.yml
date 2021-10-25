@@ -1,9 +1,9 @@
 ---
 
-oauth2_proxy__version: 7.1.3
+oauth2_proxy__version: 7.2.0
 oauth2_proxy__version_long: "{{ oauth2_proxy__version }}.linux-amd64"
 oauth2_proxy__binary_sha256sum: >-
-  07b4b8a68f93918b10caba1132250f9bd775faf4589182d15d2a56db6600032d
+  61ddf58016fdb391ecc29b115202fdc4abac6575579a7ac1ea9afe7c7a85eb26
 oauth2_proxy__prometheus_host: 127.0.0.1
 oauth2_proxy__prometheus_port: 9180
 oauth2_proxy__prometheus_bind: >-
