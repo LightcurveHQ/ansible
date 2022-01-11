@@ -1,5 +1,8 @@
 [Unit]
 Description=A reverse proxy that provides authentication with Google, Github or other provider
+{% if oauth2_proxy__start_after is defined and oauth2_proxy__start_after|length > 0 %}
+After={{ oauth2_proxy__start_after }}
+{% endif %}
 
 [Service]
 ExecStart=/usr/local/bin/oauth2_proxy --config=/usr/local/etc/oauth2_proxy.cfg --metrics-address={{ oauth2_proxy__prometheus_bind }}
