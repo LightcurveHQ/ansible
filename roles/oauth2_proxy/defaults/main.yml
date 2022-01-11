@@ -8,3 +8,4 @@ oauth2_proxy__prometheus_host: 127.0.0.1
 oauth2_proxy__prometheus_port: 9180
 oauth2_proxy__prometheus_bind: >-
   {{ oauth2_proxy__prometheus_host }}:{{ oauth2_proxy__prometheus_port }}
+# oauth2_proxy__start_after: my-vpn.service
