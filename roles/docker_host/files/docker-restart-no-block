@@ -1,0 +1,6 @@
+#!/bin/bash
+
+[ -n "$(systemctl show docker --no-page | grep SubState=running)" ] && (
+ sleep 5 ;
+ systemctl --no-block restart docker
+) &

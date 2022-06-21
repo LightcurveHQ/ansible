@@ -47,3 +47,11 @@
   file:
     state: absent
     path: "{{ cmk_usr_dir }}/plugins/mk_docker_node"
+
+- name: Ensure docker-restart-no-block file exist
+  copy:
+    src: docker-restart-no-block
+    dest: /usr/local/bin/docker-restart-no-block
+    owner: root
+    group: root
+    mode: 0744
