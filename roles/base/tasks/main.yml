@@ -1,5 +1,17 @@
 ---
 
+- name: Find cloud-init file
+  find:
+    paths: /etc/ssh/sshd_config.d
+    patterns: "*cloud-init.conf"
+  register: cloud_init_to_delete
+
+- name: Remove cloud-init sshd config file
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  with_items: "{{ cloud_init_to_delete.files }}"
+
 - name: Install secure sshd_config
   copy:
     src: sshd_config__{{ ansible_lsb.codename }}
