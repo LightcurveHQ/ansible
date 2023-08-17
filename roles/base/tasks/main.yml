@@ -28,12 +28,12 @@
     owner: root
     group: root
     mode: 0644
-  when: not inventory_hostname|ipaddr
+  when: not inventory_hostname|ansible.utils.ipaddr
 
 - name: Set hostname
   hostname:
     name: "{{ inventory_hostname }}"
-  when: not inventory_hostname|ipaddr
+  when: not inventory_hostname|ansible.utils.ipaddr
 
 - name: Decrease dhclient timeout
   lineinfile:
